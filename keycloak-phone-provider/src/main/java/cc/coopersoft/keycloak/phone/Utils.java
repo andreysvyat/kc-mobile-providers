@@ -1,24 +1,21 @@
 package cc.coopersoft.keycloak.phone;
 
 import cc.coopersoft.common.OptionalUtils;
-import cc.coopersoft.keycloak.phone.credential.PhoneOtpCredentialModel;
 import cc.coopersoft.keycloak.phone.providers.exception.PhoneNumberInvalidException;
 import cc.coopersoft.keycloak.phone.providers.spi.PhoneProvider;
+import com.google.i18n.phonenumbers.NumberParseException;
+import com.google.i18n.phonenumbers.PhoneNumberUtil;
+import com.google.i18n.phonenumbers.PhoneNumberUtil.PhoneNumberFormat;
+import jakarta.validation.constraints.NotNull;
 import org.jboss.logging.Logger;
-import org.keycloak.credential.CredentialModel;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 
-import com.google.i18n.phonenumbers.*;
-import com.google.i18n.phonenumbers.PhoneNumberUtil.PhoneNumberFormat;
-import org.keycloak.models.credential.dto.OTPSecretData;
-import org.keycloak.services.validation.Validation;
-import org.keycloak.util.JsonSerialization;
-
-import javax.validation.constraints.NotNull;
-import java.io.IOException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
@@ -74,7 +71,7 @@ public class Utils {
 
     private static Optional<String> localeToCountry(String locale){
         return OptionalUtils.ofBlank(locale).flatMap(l -> {
-            Pattern countryRegx = Pattern.compile("[^a-z]*\\-?([A-Z]{2,3})");
+            Pattern countryRegx = Pattern.compile("[^a-z]*-?([A-Z]{2,3})");
             return Optional.of(countryRegx.matcher(l))
                 .flatMap(m -> m.find() ? OptionalUtils.ofBlank(m.group(1)) : Optional.empty());
         });

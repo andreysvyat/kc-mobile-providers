@@ -1,8 +1,9 @@
 package cc.coopersoft.keycloak.phone.providers.jpa;
 
+import jakarta.persistence.*;
+import jakarta.persistence.TemporalType;
 import lombok.Data;
 
-import javax.persistence.*;
 import java.util.Date;
 
 @Entity
@@ -57,7 +58,7 @@ public class TokenCode {
     @Column(name = "CONFIRMED", nullable = false)
     private Boolean confirmed;
 
-    @Column(name = "BY_WHOM", nullable = true)
+    @Column(name = "BY_WHOM")
     private String byWhom;
 
     @Column(name = "IP")

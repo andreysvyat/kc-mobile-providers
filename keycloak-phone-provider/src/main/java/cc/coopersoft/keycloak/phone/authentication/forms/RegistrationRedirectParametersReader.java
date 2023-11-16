@@ -1,6 +1,6 @@
 package cc.coopersoft.keycloak.phone.authentication.forms;
 
-import okhttp3.HttpUrl;
+import com.squareup.okhttp.HttpUrl;
 import org.jboss.logging.Logger;
 import org.keycloak.Config;
 import org.keycloak.authentication.FormAction;

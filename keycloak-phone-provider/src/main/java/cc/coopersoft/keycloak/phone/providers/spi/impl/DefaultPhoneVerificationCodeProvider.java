@@ -10,6 +10,11 @@ import cc.coopersoft.keycloak.phone.providers.constants.TokenCodeType;
 import cc.coopersoft.keycloak.phone.providers.jpa.TokenCode;
 import cc.coopersoft.keycloak.phone.providers.representations.TokenCodeRepresentation;
 import cc.coopersoft.keycloak.phone.providers.spi.PhoneVerificationCodeProvider;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.NoResultException;
+import jakarta.persistence.TemporalType;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.ForbiddenException;
 import org.jboss.logging.Logger;
 import org.keycloak.connections.jpa.JpaConnectionProvider;
 import org.keycloak.credential.CredentialModel;
@@ -20,11 +25,6 @@ import org.keycloak.models.UserModel;
 import org.keycloak.services.validation.Validation;
 import org.keycloak.util.JsonSerialization;
 
-import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
-import javax.persistence.TemporalType;
-import javax.ws.rs.BadRequestException;
-import javax.ws.rs.ForbiddenException;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.Date;
@@ -62,20 +62,23 @@ public class DefaultPhoneVerificationCodeProvider implements PhoneVerificationCo
                     .setParameter("type", tokenCodeType.name())
                     .getSingleResult();
 
-            TokenCodeRepresentation tokenCodeRepresentation = new TokenCodeRepresentation();
-
-            tokenCodeRepresentation.setId(entity.getId());
-            tokenCodeRepresentation.setPhoneNumber(entity.getPhoneNumber());
-            tokenCodeRepresentation.setCode(entity.getCode());
-            tokenCodeRepresentation.setType(entity.getType());
-            tokenCodeRepresentation.setCreatedAt(entity.getCreatedAt());
-            tokenCodeRepresentation.setExpiresAt(entity.getExpiresAt());
-            tokenCodeRepresentation.setConfirmed(entity.getConfirmed());
-
-            return tokenCodeRepresentation;
+            return getTokenCodeRepresentation(entity);
         } catch (NoResultException e) {
             return null;
         }
+    }
+
+    private static TokenCodeRepresentation getTokenCodeRepresentation(TokenCode entity) {
+        TokenCodeRepresentation tokenCodeRepresentation = new TokenCodeRepresentation();
+
+        tokenCodeRepresentation.setId(entity.getId());
+        tokenCodeRepresentation.setPhoneNumber(entity.getPhoneNumber());
+        tokenCodeRepresentation.setCode(entity.getCode());
+        tokenCodeRepresentation.setType(entity.getType());
+        tokenCodeRepresentation.setCreatedAt(entity.getCreatedAt());
+        tokenCodeRepresentation.setExpiresAt(entity.getExpiresAt());
+        tokenCodeRepresentation.setConfirmed(entity.getConfirmed());
+        return tokenCodeRepresentation;
     }
 
     @Override
@@ -104,8 +107,7 @@ public class DefaultPhoneVerificationCodeProvider implements PhoneVerificationCo
                 .setParameter("date", oneHourAgo, TemporalType.TIMESTAMP)
                 .setParameter("type", tokenCodeType.name())
                 .getSingleResult());
-            if (sourceCount > sourceHourMaximum)
-                return true;
+            return sourceCount > sourceHourMaximum;
         }
 
         return false;

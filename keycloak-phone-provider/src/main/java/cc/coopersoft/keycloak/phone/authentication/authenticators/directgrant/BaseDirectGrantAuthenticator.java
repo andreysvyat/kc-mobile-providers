@@ -1,6 +1,7 @@
 package cc.coopersoft.keycloak.phone.authentication.authenticators.directgrant;
 
 import cc.coopersoft.common.OptionalUtils;
+import jakarta.ws.rs.core.Response;
 import org.keycloak.authentication.AuthenticationFlowContext;
 import org.keycloak.authentication.AuthenticationFlowError;
 import org.keycloak.authentication.Authenticator;
@@ -10,15 +11,15 @@ import org.keycloak.models.RealmModel;
 import org.keycloak.models.UserModel;
 import org.keycloak.representations.idm.OAuth2ErrorRepresentation;
 
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import java.util.Optional;
+
+import static jakarta.ws.rs.core.MediaType.*;
 
 public abstract class BaseDirectGrantAuthenticator implements Authenticator {
 
     public Response errorResponse(int status, String error, String errorDescription) {
         OAuth2ErrorRepresentation errorRep = new OAuth2ErrorRepresentation(error, errorDescription);
-        return Response.status(status).entity(errorRep).type(MediaType.APPLICATION_JSON_TYPE).build();
+        return Response.status(status).entity(errorRep).type(APPLICATION_JSON_TYPE).build();
     }
 
     protected Optional<String> getPhoneNumber(AuthenticationFlowContext context){

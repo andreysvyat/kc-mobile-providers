@@ -2,6 +2,13 @@ package cc.coopersoft.keycloak.phone.providers.rest;
 
 import cc.coopersoft.keycloak.phone.providers.constants.TokenCodeType;
 import cc.coopersoft.keycloak.phone.providers.spi.PhoneVerificationCodeProvider;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.NotAuthorizedException;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.Response;
 import org.jboss.logging.Logger;
 import org.jboss.resteasy.annotations.cache.NoCache;
 import org.keycloak.models.KeycloakSession;
@@ -9,10 +16,7 @@ import org.keycloak.models.UserModel;
 import org.keycloak.services.managers.AppAuthManager;
 import org.keycloak.services.managers.AuthenticationManager.AuthResult;
 
-import javax.ws.rs.*;
-import javax.ws.rs.core.Response;
-
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import static jakarta.ws.rs.core.MediaType.*;
 
 public class VerificationCodeResource extends TokenCodeResource {
 
@@ -39,6 +43,8 @@ public class VerificationCodeResource extends TokenCodeResource {
         if (auth == null) throw new NotAuthorizedException("Bearer");
         if (phoneNumber == null) throw new BadRequestException("Must inform a phone number");
         if (code == null) throw new BadRequestException("Must inform a token code");
+
+        logger.info("Handle code from phone " + phoneNumber);
 
         UserModel user = auth.getUser();
         getTokenCodeService().validateCode(user, phoneNumber, code);
