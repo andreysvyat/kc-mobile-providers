@@ -14,6 +14,7 @@ import org.keycloak.models.UserModel;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -45,14 +46,8 @@ public class Utils {
 
 
         return numbers.stream().flatMap(number -> userProvider
-            .searchForUserByUserAttributeStream(realm,"phoneNumber", number))
-            .max((u1, u2) -> {
-                var result = comparatorAttributesAnyMatch(u1,u2,"phoneNumberVerified","true"::equals);
-                if (result == 0){
-                    result = comparatorAttributesAnyMatch(u1,u2,"phoneNumber", number -> number.startsWith("+"));
-                }
-                return result;
-            });
+            .searchForUserStream(realm, Map.of(UserModel.USERNAME, number)))
+            .findAny();
 
     }
 
